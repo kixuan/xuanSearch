@@ -7,6 +7,7 @@
       size="large"
       @search="onSearch"
     />
+    {{ JSON.stringify(searchParams) }}
     <MyDivider />
     <a-tabs v-model:activeKey="activeKey" @change="onTabChange">
       <a-tab-pane key="post" tab="文章">
@@ -29,10 +30,21 @@ import PictureList from "@/components/PictureList.vue";
 import UserList from "@/components/UserList.vue";
 import MyDivider from "@/components/MyDivider.vue";
 import { useRoute, useRouter } from "vue-router";
+import myAxios from "@/plugins/myAxios";
 
 const postList = ref([]);
 const userList = ref([]);
 const pictureList = ref([]);
+
+myAxios.post("/post/list/page/vo", {}).then((res: any) => {
+  console.log(res);
+  postList.value = res.records;
+});
+
+myAxios.post("/user/list/page/vo", {}).then((res: any) => {
+  console.log(res);
+  userList.value = res.records;
+});
 
 const route = useRoute();
 const router = useRouter();
@@ -46,7 +58,6 @@ const initSearchParams = {
 };
 
 const searchParams = ref(initSearchParams);
-const searchText = ref(route.query.text || "");
 
 watchEffect(() => {
   searchParams.value = {
@@ -54,15 +65,11 @@ watchEffect(() => {
     text: route.query.text,
     type: route.params.category,
   } as any;
-  // loadData(searchParams.value);
 });
 
 const onSearch = (value: string) => {
   router.push({
-    query: {
-      ...searchParams.value,
-      text: value,
-    },
+    query: searchParams.value,
   });
 };
 
