@@ -1,13 +1,12 @@
 <template>
   <div class="index-page">
     <a-input-search
-      v-model:value="searchParams.text"
+      v-model:value="searchText"
       placeholder="请输入搜索关键词"
       enter-button="搜索"
       size="large"
       @search="onSearch"
     />
-    {{ JSON.stringify(searchParams) }}
     <MyDivider />
     <a-tabs v-model:activeKey="activeKey" @change="onTabChange">
       <a-tab-pane key="post" tab="文章">
@@ -36,6 +35,19 @@ import { message } from "ant-design-vue";
 const postList = ref([]);
 const userList = ref([]);
 const pictureList = ref([]);
+
+const route = useRoute();
+const router = useRouter();
+const activeKey = route.params.category;
+
+const initSearchParams = {
+  type: activeKey,
+  text: "",
+  pageSize: 10,
+  pageNum: 1,
+};
+
+const searchText = ref(route.query.text || "");
 
 // /**
 //  * 第一版：加载数据
@@ -67,57 +79,67 @@ const pictureList = ref([]);
 //   });
 // };
 
+// /**
+//  * 第二版：加载聚合数据
+//  * @param params
+//  */
+// const loadAllData = (params: any) => {
+//   const query = {
+//     ...params,
+//     searchText: params.text,
+//   };
+//   myAxios.post("search/all", query).then((res: any) => {
+//     postList.value = res.postList;
+//     userList.value = res.userList;
+//     pictureList.value = res.pictureList;
+//   });
+// };
+
 /**
- * 加载聚合数据
+ * 加载单类数据
  * @param params
  */
 const loadData = (params: any) => {
+  const { type } = params;
+  if (!type) {
+    message.error("类别为空");
+    return;
+  }
   const query = {
     ...params,
     searchText: params.text,
   };
   myAxios.post("search/all", query).then((res: any) => {
-    postList.value = res.postList;
-    userList.value = res.userList;
-    pictureList.value = res.pictureList;
+    if (type == "post") {
+      postList.value = res.postList;
+    } else if (type == "user") {
+      userList.value = res.userList;
+    } else if (type == "picture") {
+      pictureList.value = res.pictureList;
+    }
   });
 };
 
-const route = useRoute();
-const router = useRouter();
-const activeKey = route.params.category;
-
-const initSearchParams = {
-  type: activeKey,
-  text: "",
-  pageSize: 10,
-  pageNum: 1,
-};
-
-/*记录搜索关键字*/
 const searchParams = ref(initSearchParams);
-// ⾸次请求
-loadData(initSearchParams);
 
 watchEffect(() => {
   searchParams.value = {
-    // 我们把这个初始值作为⼀个兜底
     ...initSearchParams,
-    //它改变的变量    text: route.query.text,
+    text: route.query.text,
     type: route.params.category,
   } as any;
+  loadData(searchParams.value);
 });
 
 const onSearch = (value: string) => {
-  console.log(value);
   router.push({
-    query: searchParams.value,
+    query: {
+      ...searchParams.value,
+      text: value,
+    },
   });
-  // 根据条件查询
-  loadData(searchParams.value);
 };
 
-// 绑定url
 const onTabChange = (key: string) => {
   router.push({
     path: `/${key}`,
