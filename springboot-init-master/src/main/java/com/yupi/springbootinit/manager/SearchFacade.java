@@ -2,10 +2,7 @@ package com.yupi.springbootinit.manager;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yupi.springbootinit.common.ErrorCode;
-import com.yupi.springbootinit.dataSource.DataSource;
-import com.yupi.springbootinit.dataSource.PictureDataSource;
-import com.yupi.springbootinit.dataSource.PostDataSource;
-import com.yupi.springbootinit.dataSource.UserDataSource;
+import com.yupi.springbootinit.dataSource.*;
 import com.yupi.springbootinit.exception.BusinessException;
 import com.yupi.springbootinit.exception.ThrowUtils;
 import com.yupi.springbootinit.model.dto.picture.PictureQueryRequest;
@@ -25,8 +22,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -47,6 +42,9 @@ public class SearchFacade {
 
     @Resource
     private PictureDataSource pictureDataSource;
+
+    @Resource
+    private DataSourceRegistry dataSourceRegistry;
 
 
     public SearchVO searchAll(@RequestBody SearchRequest searchQueryRequest, HttpServletRequest request) {
@@ -84,15 +82,8 @@ public class SearchFacade {
             }
         } else {
             // 简化switch代码
-            Map<String, DataSource<?>> typeDataSourceMap = new HashMap<String, DataSource<?>>() {
-                {
-                    put(SearchTypeEnum.USER.getValue(), userDataSource);
-                    put(SearchTypeEnum.POST.getValue(), postDataSource);
-                    put(SearchTypeEnum.PICTURE.getValue(), pictureDataSource);
-                }
-            };
             SearchVO searchVO = new SearchVO();
-            DataSource<?> searchDataSource = typeDataSourceMap.get(type);
+            DataSource<?> searchDataSource = dataSourceRegistry.getDataSourceByType(type);
             Page<?> page = searchDataSource.doSearch(searchText, current, pageSize);
             searchVO.setDataList(page.getRecords());
             return searchVO;
