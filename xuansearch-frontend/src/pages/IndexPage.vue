@@ -36,15 +36,25 @@ const postList = ref([]);
 const userList = ref([]);
 const pictureList = ref([]);
 
-myAxios.post("/post/list/page/vo", {}).then((res: any) => {
-  console.log(res);
-  postList.value = res.records;
-});
-
-myAxios.post("/user/list/page/vo", {}).then((res: any) => {
-  console.log(res);
-  userList.value = res.records;
-});
+/**
+ * 加载数据
+ * @param params
+ */
+const loadData = (params: any) => {
+  const query = {
+    ...params,
+    searchText: params.text,
+  };
+  myAxios.post("/post/list/page/vo", query).then((res: any) => {
+    postList.value = res.records;
+  });
+  myAxios.post("/picture/list/page/vo", query).then((res: any) => {
+    pictureList.value = res.records;
+  });
+  myAxios.post("/user/list/page/vo", query).then((res: any) => {
+    userList.value = res.records;
+  });
+};
 
 const route = useRoute();
 const router = useRouter();
@@ -57,20 +67,27 @@ const initSearchParams = {
   pageNum: 1,
 };
 
+/*记录搜索关键字*/
 const searchParams = ref(initSearchParams);
+// ⾸次请求
+loadData(initSearchParams);
 
 watchEffect(() => {
   searchParams.value = {
+    // 我们把这个初始值作为⼀个兜底
     ...initSearchParams,
-    text: route.query.text,
+    //它改变的变量    text: route.query.text,
     type: route.params.category,
   } as any;
 });
 
 const onSearch = (value: string) => {
+  console.log(value);
   router.push({
     query: searchParams.value,
   });
+  // 根据条件查询
+  loadData(searchParams.value);
 };
 
 // 绑定url
