@@ -31,13 +31,44 @@ import UserList from "@/components/UserList.vue";
 import MyDivider from "@/components/MyDivider.vue";
 import { useRoute, useRouter } from "vue-router";
 import myAxios from "@/plugins/myAxios";
+import { message } from "ant-design-vue";
 
 const postList = ref([]);
 const userList = ref([]);
 const pictureList = ref([]);
 
+// /**
+//  * 第一版：加载数据
+//  * @param params
+//  */
+// const loadDataOld = (params: any) => {
+//   const postQuery = {
+//     ...params,
+//     searchText: params.text,
+//   };
+//   myAxios.post("post/list/page/vo", postQuery).then((res: any) => {
+//     postList.value = res.records;
+//   });
+//
+//   const userQuery = {
+//     ...params,
+//     userName: params.text,
+//   };
+//   myAxios.post("user/list/page/vo", userQuery).then((res: any) => {
+//     userList.value = res.records;
+//   });
+//
+//   const pictureQuery = {
+//     ...params,
+//     searchText: params.text,
+//   };
+//   myAxios.post("picture/list/page/vo", pictureQuery).then((res: any) => {
+//     pictureList.value = res.records;
+//   });
+// };
+
 /**
- * 加载数据
+ * 加载聚合数据
  * @param params
  */
 const loadData = (params: any) => {
@@ -45,14 +76,10 @@ const loadData = (params: any) => {
     ...params,
     searchText: params.text,
   };
-  myAxios.post("/post/list/page/vo", query).then((res: any) => {
-    postList.value = res.records;
-  });
-  myAxios.post("/picture/list/page/vo", query).then((res: any) => {
-    pictureList.value = res.records;
-  });
-  myAxios.post("/user/list/page/vo", query).then((res: any) => {
-    userList.value = res.records;
+  myAxios.post("search/all", query).then((res: any) => {
+    postList.value = res.postList;
+    userList.value = res.userList;
+    pictureList.value = res.pictureList;
   });
 };
 
