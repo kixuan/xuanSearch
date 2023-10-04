@@ -7,6 +7,7 @@
       size="large"
       @search="onSearch"
     />
+    {{ JSON.stringify(searchParams) }}
     <MyDivider />
     <a-tabs v-model:activeKey="activeKey" @change="onTabChange">
       <a-tab-pane key="post" tab="文章">
@@ -29,10 +30,58 @@ import PictureList from "@/components/PictureList.vue";
 import UserList from "@/components/UserList.vue";
 import MyDivider from "@/components/MyDivider.vue";
 import { useRoute, useRouter } from "vue-router";
+import myAxios from "@/plugins/myAxios";
+import { message } from "ant-design-vue";
 
 const postList = ref([]);
 const userList = ref([]);
 const pictureList = ref([]);
+
+// /**
+//  * 第一版：加载数据
+//  * @param params
+//  */
+// const loadDataOld = (params: any) => {
+//   const postQuery = {
+//     ...params,
+//     searchText: params.text,
+//   };
+//   myAxios.post("post/list/page/vo", postQuery).then((res: any) => {
+//     postList.value = res.records;
+//   });
+//
+//   const userQuery = {
+//     ...params,
+//     userName: params.text,
+//   };
+//   myAxios.post("user/list/page/vo", userQuery).then((res: any) => {
+//     userList.value = res.records;
+//   });
+//
+//   const pictureQuery = {
+//     ...params,
+//     searchText: params.text,
+//   };
+//   myAxios.post("picture/list/page/vo", pictureQuery).then((res: any) => {
+//     pictureList.value = res.records;
+//   });
+// };
+
+/**
+ * 加载聚合数据
+ * @param params
+ */
+const loadData = (params: any) => {
+  const query = {
+    ...params,
+    searchText: params.text,
+  };
+  myAxios.post("search/all", query).then((res: any) => {
+    postList.value = res.postList;
+    userList.value = res.userList;
+    pictureList.value = res.pictureList;
+  });
+};
 
 const route = useRoute();
 const router = useRouter();
@@ -45,25 +94,27 @@ const initSearchParams = {
   pageNum: 1,
 };
 
+/*记录搜索关键字*/
 const searchParams = ref(initSearchParams);
-const searchText = ref(route.query.text || "");
+// ⾸次请求
+loadData(initSearchParams);
 
 watchEffect(() => {
   searchParams.value = {
+    // 我们把这个初始值作为⼀个兜底
     ...initSearchParams,
-    text: route.query.text,
+    //它改变的变量    text: route.query.text,
     type: route.params.category,
   } as any;
-  // loadData(searchParams.value);
 });
 
 const onSearch = (value: string) => {
+  console.log(value);
   router.push({
-    query: {
-      ...searchParams.value,
-      text: value,
-    },
+    query: searchParams.value,
   });
+  // 根据条件查询
+  loadData(searchParams.value);
 };
 
 // 绑定url
