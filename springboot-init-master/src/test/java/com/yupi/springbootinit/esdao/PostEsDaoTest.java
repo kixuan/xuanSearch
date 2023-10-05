@@ -1,9 +1,10 @@
 package com.yupi.springbootinit.esdao;
 
-import com.yupi.springbootinit.model.dto.post.PostEsDTO;
-import com.yupi.springbootinit.model.dto.post.PostQueryRequest;
-import com.yupi.springbootinit.model.entity.Post;
-import com.yupi.springbootinit.service.PostService;
+import com.xuan.springbootinit.esdao.PostEsDao;
+import com.xuan.springbootinit.model.dto.post.PostEsDTO;
+import com.xuan.springbootinit.model.dto.post.PostQueryRequest;
+import com.xuan.springbootinit.model.entity.Post;
+import com.xuan.springbootinit.service.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -18,9 +19,6 @@ import java.util.Optional;
 
 /**
  * 帖子 ES 操作测试
- *
- * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
- * @from <a href="https://yupi.icu">编程导航知识星球</a>
  */
 @SpringBootTest
 public class PostEsDaoTest {
