@@ -2,6 +2,7 @@ package com.yupi.springbootinit.dataSource;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yupi.springbootinit.model.dto.post.PostQueryRequest;
+import com.yupi.springbootinit.model.entity.Post;
 import com.yupi.springbootinit.model.vo.PostVO;
 import com.yupi.springbootinit.service.PostService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +28,14 @@ public class PostDataSource implements DataSource<PostVO> {
         postQueryRequest.setPageSize(pageSize);
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = servletRequestAttributes.getRequest();
-        Page<PostVO> postVOPage = postService.listPostVOByPage(postQueryRequest, request);
-        return postVOPage;
+
+        // 使用 ES 搜索
+        Page<Post> postPage = postService.searchFromEs(postQueryRequest);
+        return postService.getPostVOPage(postPage, request);
+
+        // 普通搜索
+        // Page<PostVO> postVOPage = postService.listPostVOByPage(postQueryRequest, request);
+        // return postVOPage;
     }
 
 }
