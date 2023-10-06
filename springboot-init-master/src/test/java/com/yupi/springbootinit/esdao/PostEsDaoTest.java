@@ -1,27 +1,24 @@
 package com.yupi.springbootinit.esdao;
 
-import com.yupi.springbootinit.model.dto.post.PostEsDTO;
-import com.yupi.springbootinit.model.dto.post.PostQueryRequest;
-import com.yupi.springbootinit.model.entity.Post;
-import com.yupi.springbootinit.service.PostService;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import javax.annotation.Resource;
-
+import com.xuan.springbootinit.esdao.PostEsDao;
+import com.xuan.springbootinit.model.dto.post.PostEsDTO;
+import com.xuan.springbootinit.model.dto.post.PostQueryRequest;
+import com.xuan.springbootinit.model.entity.Post;
+import com.xuan.springbootinit.service.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import javax.annotation.Resource;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
 /**
  * 帖子 ES 操作测试
- *
- * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
- * @from <a href="https://yupi.icu">编程导航知识星球</a>
  */
 @SpringBootTest
 public class PostEsDaoTest {
@@ -40,6 +37,7 @@ public class PostEsDaoTest {
         System.out.println(page);
     }
 
+    // 查
     @Test
     void testSelect() {
         System.out.println(postEsDao.count());
@@ -49,15 +47,14 @@ public class PostEsDaoTest {
         System.out.println(postList);
     }
 
+    // 增
     @Test
     void testAdd() {
         PostEsDTO postEsDTO = new PostEsDTO();
-        postEsDTO.setId(1L);
-        postEsDTO.setTitle("test");
-        postEsDTO.setContent("test");
-        postEsDTO.setTags(Arrays.asList("java", "python"));
-        postEsDTO.setThumbNum(1);
-        postEsDTO.setFavourNum(1);
+        postEsDTO.setId(2L);
+        postEsDTO.setTitle("mygo");
+        postEsDTO.setContent("mygo is great！");
+        postEsDTO.setTags(Arrays.asList("mygo", "ano"));
         postEsDTO.setUserId(1L);
         postEsDTO.setCreateTime(new Date());
         postEsDTO.setUpdateTime(new Date());
@@ -81,5 +78,17 @@ public class PostEsDaoTest {
     void testFindByCategory() {
         List<PostEsDTO> postEsDaoTestList = postEsDao.findByUserId(1L);
         System.out.println(postEsDaoTestList);
+    }
+
+    @Test
+    void testFindByTitle() {
+        List<PostEsDTO> postEsDTOS = postEsDao.findByTitle("mygo");
+        System.out.println(postEsDTOS);
+    }
+
+    // 删
+    @Test
+    void testDelete() {
+        postEsDao.deleteById(1L);
     }
 }
